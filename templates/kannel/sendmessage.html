@@ -1,0 +1,136 @@
+{% extends 'dashboard_base.html' %}
+{% load bootstrap %}
+{% block title %} Send Message{% endblock %}
+{% block content_main %}
+<div class="jumbotron">
+    <h1> Send Message</h1>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{form|bootstrap}}
+        <label for="id_message">
+        <!-- <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"> -->
+            <span class="badge badge-success">SMS Count : <span class="badge badge-pill badge-dark" id="sms-count">0</span></span>
+            <span class="badge badge-success">Character Count : <span class="badge badge-pill badge-dark" id="char-count">0</span></span> 
+            <button class="btn btn-sm btn-warning" id="id_unitoascii" disabled='disabled'>to Ascii</button>
+        </label>
+        <div>
+        <button type="submit" class="btn btn-primary">Send message</button>
+        </div>
+    </form>
+
+</div>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script>
+    $(document).ready(function (){
+         $('#id_message').on('keyup', function(){
+               var smsText = $.trim($(this).val());
+               smsAndCharCount(smsText);
+         });
+         $('#id_unitoascii').click(function(e){
+             e.preventDefault();
+             console.log('Transforming to Ascii');
+             var msg = $('#id_message').val()
+             $.ajax({
+                 url: "{% url 'unitoascii' %}",
+                 type: 'get',
+                 data : {'msg':msg},
+                 success: function(response){
+                     if(response.status == 'success'){
+                        $('#id_message').val(response.msg);
+                        smsAndCharCount(response.msg);
+                     }
+                     else{
+                         console.log(response.msg);
+                     }
+                 }
+
+             });
+         });
+
+
+         //load templates
+         $('#id_senderid').on('change', function(e){
+             e.preventDefault();
+             var senderid = $(this).val();
+             $.ajax({
+                 url: "{% url 'load-templates' %}",
+                 type: 'get',
+                 data : {'senderid':senderid},
+                 success: function(response){
+                     //console.log(response);
+                     $('#id_templateid').html(response);
+                 }
+             })
+         });
+        });
+
+        // update message based on template selection
+        $('#id_templateid').on('change', function(e){
+            e.preventDefault();
+            var template_message = $('#id_templateid option:selected').text();
+            // update the message box
+            if($(this).val() == ''){
+            $('#id_message').html('');
+            }
+            else {
+            $('#id_message').html(template_message);
+            }
+        });
+
+         function hasUnicodeChar(smsText){
+             var isUnicode = false;
+             var arr = smsText.split('');
+
+             $.each(arr, function(key, item){
+                 if(item.charCodeAt(0) > 127){
+                     isUnicode = true;
+                     return false;
+                 }
+             })
+             return isUnicode;
+         }
+   
+          
+         function getSmsCount(smsText, isUnicode){
+             var smscount = 0;
+             var charCount = smsText.length;
+             if((charCount <= 160 && isUnicode == false) || (charCount <= 70 && isUnicode == true))
+             {
+                 smscount = 1;
+             }
+             else {
+               if(isUnicode == false){
+                 smscount = parseInt(Math.ceil(parseFloat(charCount / 153)));
+               }else {
+                 smscount = parseInt(Math.ceil(parseFloat(charCount / 67)));
+             }
+
+             }
+             
+             return smscount;
+         }
+
+         function smsAndCharCount(smsText){
+             var isUnicode = false;
+             isUnicode = hasUnicodeChar(smsText);
+             if(isUnicode == true){
+                 $('#id_unitoascii').prop('disabled', false);
+             }else{
+                 $('#id_unitoascii').prop('disabled', true);
+             }
+
+           
+             if(smsText != ""){
+             var smscount = getSmsCount(smsText, isUnicode);
+             var charCount = smsText.length;
+             $('#sms-count').text(smscount);
+             $('#char-count').text(charCount);
+
+             }else{
+                 $('#sms-count').text(0);
+                 $('#char-count').text(0);
+             }
+         }
+
+</script
+{% endblock content_main %}

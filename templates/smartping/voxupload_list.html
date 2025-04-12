@@ -1,0 +1,44 @@
+{% extends 'dashboard_base.html' %}
+{% load render_table from django_tables2 %}
+
+{% block content_main %}
+<div class="mt-4 p-5 bg-light text-dark rounded">
+<a href="{% url 'smartping:audio_create' %}" class="btn btn-primary">Add Audio</a>
+{% render_table table %}
+</div>
+<script>
+    let startvalue = '|>';
+    let stopvalue = '||';
+    let currentlyplaying = '';
+    function playAudio(elem_id){
+        // check if item is playing
+        if (currentlyplaying === ''){
+            let x = document.getElementById(elem_id);
+            x.play();
+            x.nextElementSibling.nextElementSibling.innerHTML = stopvalue;
+            currentlyplaying = elem_id;
+        }
+        else if(currentlyplaying === elem_id){
+            let x = document.getElementById(currentlyplaying);
+            x.pause();
+            x.nextElementSibling.nextElementSibling.innerHTML = startvalue;
+            currentlyplaying = '';
+        }
+        else {
+            let y = document.getElementById(currentlyplaying);
+            y.pause();
+            y.currentTime = 0;
+            y.nextElementSibling.nextElementSibling.innerHTML = startvalue;
+
+            let x = document.getElementById(elem_id);
+            x.play();
+            x.currentTime = 0;
+            x.nextElementSibling.nextElementSibling.innerHTML = stopvalue;
+            currentlyplaying = elem_id;
+        }
+            
+        
+                   
+    }
+</script>
+{% endblock content_main %}

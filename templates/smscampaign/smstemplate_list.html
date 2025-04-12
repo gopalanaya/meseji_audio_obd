@@ -1,0 +1,21 @@
+{% extends 'dashboard_base.html' %}
+{% load render_table from django_tables2 %}
+
+
+{% block content_main %}
+
+<div class="mt-4 p-5 bg-light text-dark rounded">
+    <h1>Sms Templates</h1>
+    <em>
+        Only Use this page when you want to send an sms when
+        <ul>
+            <li>User pick a call</li>
+            <li>User has listen audio upto required number of seconds</li>
+        </ul>
+    </em>
+    <a href="{% url 'smscampaign:smstemplate_create' %}" class="btn btn-primary">Add Template</a>
+    <a href="{% url 'smscampaign:smsreport_list' %}" class="btn btn-info">Check Sms Report</a>
+    {% render_table table %}
+    </div>
+
+{% endblock %}

@@ -1,0 +1,282 @@
+[
+{
+  "model": "smartping.campaigncreation",
+  "pk": 28,
+  "fields": {
+    "transitionId": "",
+    "voiceId": "34667",
+    "campaignData": "uploads/campaign_data/34667_164531.txt",
+    "obd_type": "SINGLE_VOICE",
+    "dtmf": "",
+    "call_patch_no": "",
+    "err_code": "",
+    "err_desc": "",
+    "campg_id": "",
+    "is_sent": true,
+    "status_fetched": false,
+    "sms_required": true,
+    "created_at": "2024-10-04T11:26:00.820Z",
+    "updated_at": "2024-10-04T11:26:00.826Z"
+  }
+},
+{
+  "model": "smartping.campaigncreation",
+  "pk": 29,
+  "fields": {
+    "transitionId": "",
+    "voiceId": "34667",
+    "campaignData": "uploads/campaign_data/34667_165047.txt",
+    "obd_type": "SINGLE_VOICE",
+    "dtmf": "",
+    "call_patch_no": "",
+    "err_code": "",
+    "err_desc": "",
+    "campg_id": "339560",
+    "is_sent": true,
+    "status_fetched": false,
+    "sms_required": true,
+    "created_at": "2024-10-04T11:26:00.820Z",
+    "updated_at": "2024-10-04T11:26:00.826Z"
+  }
+},
+{
+  "model": "smartping.campaigncreation",
+  "pk": 30,
+  "fields": {
+    "transitionId": "",
+    "voiceId": "34667",
+    "campaignData": "uploads/campaign_data/34667_165611.txt",
+    "obd_type": "SINGLE_VOICE",
+    "dtmf": "",
+    "call_patch_no": "",
+    "err_code": "",
+    "err_desc": "",
+    "campg_id": "339565",
+    "is_sent": true,
+    "status_fetched": false,
+    "sms_required": true,
+    "created_at": "2024-10-04T11:26:11.017Z",
+    "updated_at": "2024-10-04T11:26:11.317Z"
+  }
+},
+{
+  "model": "smartping.campaigncreation",
+  "pk": 31,
+  "fields": {
+    "transitionId": "",
+    "voiceId": "34667",
+    "campaignData": "uploads/campaign_data/34667_170102.txt",
+    "obd_type": "SINGLE_VOICE",
+    "dtmf": "",
+    "call_patch_no": "",
+    "err_code": "",
+    "err_desc": "",
+    "campg_id": "339572,339573,339574,339575,339576,339578,339579,339581,339582,339583",
+    "is_sent": true,
+    "status_fetched": false,
+    "sms_required": true,
+    "created_at": "2024-10-04T11:31:02.706Z",
+    "updated_at": "2024-10-04T11:34:14.332Z"
+  }
+},
+{
+  "model": "smartping.campaigncreation",
+  "pk": 32,
+  "fields": {
+    "transitionId": "",
+    "voiceId": "34667",
+    "campaignData": "uploads/campaign_data/34667_141024.txt",
+    "obd_type": "SINGLE_VOICE",
+    "dtmf": "",
+    "call_patch_no": "",
+    "err_code": "",
+    "err_desc": "",
+    "campg_id": "340319,340320,340321,340322,340323,340324,340325,340326,340327,340328,340329,340330",
+    "is_sent": true,
+    "status_fetched": false,
+    "sms_required": true,
+    "created_at": "2024-10-07T08:40:24.096Z",
+    "updated_at": "2024-10-07T08:43:47.930Z"
+  }
+},
+{
+  "model": "smartping.campaigncreation",
+  "pk": 33,
+  "fields": {
+    "transitionId": "",
+    "voiceId": "34357",
+    "campaignData": "uploads/campaign_data/34357_101736.txt",
+    "obd_type": "SINGLE_VOICE",
+    "dtmf": "",
+    "call_patch_no": "",
+    "err_code": "",
+    "err_desc": "",
+    "campg_id": "341277",
+    "is_sent": true,
+    "status_fetched": false,
+    "sms_required": true,
+    "created_at": "2024-10-10T04:47:36.155Z",
+    "updated_at": "2024-10-10T04:47:36.919Z"
+  }
+},
+{
+  "model": "smartping.campaigncreation",
+  "pk": 34,
+  "fields": {
+    "transitionId": "",
+    "voiceId": "34357",
+    "campaignData": "uploads/campaign_data/34357_103250.txt",
+    "obd_type": "SINGLE_VOICE",
+    "dtmf": "",
+    "call_patch_no": "",
+    "err_code": "",
+    "err_desc": "",
+    "campg_id": "341290",
+    "is_sent": true,
+    "status_fetched": false,
+    "sms_required": true,
+    "created_at": "2024-10-10T05:02:50.957Z",
+    "updated_at": "2024-10-10T05:02:51.250Z"
+  }
+},
+{
+  "model": "smartping.campaigncreation",
+  "pk": 35,
+  "fields": {
+    "transitionId": "",
+    "voiceId": "34357",
+    "campaignData": "uploads/campaign_data/34357_121427.txt",
+    "obd_type": "SINGLE_VOICE",
+    "dtmf": "",
+    "call_patch_no": "",
+    "err_code": "",
+    "err_desc": "",
+    "campg_id": "341338,341340,,341342,341343,341344,341345,341347,341348,341349",
+    "is_sent": true,
+    "status_fetched": false,
+    "sms_required": true,
+    "created_at": "2024-10-10T06:44:27.044Z",
+    "updated_at": "2024-10-10T06:47:00.386Z"
+  }
+},
+{
+  "model": "smartping.campaigncreation",
+  "pk": 36,
+  "fields": {
+    "transitionId": "",
+    "voiceId": "34667",
+    "campaignData": "uploads/campaign_data/34667_152654.txt",
+    "obd_type": "SINGLE_VOICE",
+    "dtmf": "",
+    "call_patch_no": "",
+    "err_code": "",
+    "err_desc": "",
+    "campg_id": "342405,,342406,342407,342408,,342409,,342410,,",
+    "is_sent": true,
+    "status_fetched": false,
+    "sms_required": true,
+    "created_at": "2024-10-13T09:56:54.702Z",
+    "updated_at": "2024-10-13T09:58:43.963Z"
+  }
+},
+{
+  "model": "smartping.campaigncreation",
+  "pk": 37,
+  "fields": {
+    "transitionId": "",
+    "voiceId": "34667",
+    "campaignData": "uploads/campaign_data/34667_153824.txt",
+    "obd_type": "SINGLE_VOICE",
+    "dtmf": "",
+    "call_patch_no": "",
+    "err_code": "",
+    "err_desc": "",
+    "campg_id": "342411,342412,342413",
+    "is_sent": true,
+    "status_fetched": false,
+    "sms_required": true,
+    "created_at": "2024-10-13T10:08:24.755Z",
+    "updated_at": "2024-10-13T10:10:10.890Z"
+  }
+},
+{
+  "model": "smartping.campaigncreation",
+  "pk": 38,
+  "fields": {
+    "transitionId": "",
+    "voiceId": "34667",
+    "campaignData": "uploads/campaign_data/34667_154509.txt",
+    "obd_type": "SINGLE_VOICE",
+    "dtmf": "",
+    "call_patch_no": "",
+    "err_code": "",
+    "err_desc": "",
+    "campg_id": "342414",
+    "is_sent": true,
+    "status_fetched": false,
+    "sms_required": true,
+    "created_at": "2024-10-13T10:15:09.973Z",
+    "updated_at": "2024-10-13T10:15:30.281Z"
+  }
+},
+{
+  "model": "smartping.campaigncreation",
+  "pk": 39,
+  "fields": {
+    "transitionId": "",
+    "voiceId": "34667",
+    "campaignData": "uploads/campaign_data/34667_155615.txt",
+    "obd_type": "SINGLE_VOICE",
+    "dtmf": "",
+    "call_patch_no": "",
+    "err_code": "",
+    "err_desc": "",
+    "campg_id": "342415",
+    "is_sent": true,
+    "status_fetched": false,
+    "sms_required": true,
+    "created_at": "2024-10-13T10:26:15.404Z",
+    "updated_at": "2024-10-13T10:26:49.556Z"
+  }
+},
+{
+  "model": "smartping.campaigncreation",
+  "pk": 40,
+  "fields": {
+    "transitionId": "",
+    "voiceId": "34667",
+    "campaignData": "uploads/campaign_data/34667_104440.txt",
+    "obd_type": "SINGLE_VOICE",
+    "dtmf": "",
+    "call_patch_no": "",
+    "err_code": "",
+    "err_desc": "",
+    "campg_id": "343228,343229,343230,343231,343232,343233,343235,343236,343237",
+    "is_sent": true,
+    "status_fetched": false,
+    "sms_required": true,
+    "created_at": "2024-10-16T05:14:40.880Z",
+    "updated_at": "2024-10-16T05:19:40.145Z"
+  }
+},
+{
+  "model": "smartping.campaigncreation",
+  "pk": 41,
+  "fields": {
+    "transitionId": "",
+    "voiceId": "34667",
+    "campaignData": "uploads/campaign_data/34667_134525.txt",
+    "obd_type": "SINGLE_VOICE",
+    "dtmf": "",
+    "call_patch_no": "",
+    "err_code": "",
+    "err_desc": "",
+    "campg_id": "345369,345370,345372,345373,345374,345375,345376",
+    "is_sent": true,
+    "status_fetched": false,
+    "sms_required": true,
+    "created_at": "2024-10-19T08:15:25.882Z",
+    "updated_at": "2024-10-19T08:19:00.977Z"
+  }
+}
+]

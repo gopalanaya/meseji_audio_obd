@@ -1,0 +1,109 @@
+{% extends 'dashboard_base.html' %}
+{% load render_table from django_tables2 %}
+{% load export_url from django_tables2 %}
+{% block title %} Summary {% endblock %}
+{% block content_main %}
+    <link rel="stylesheet" href="https://formden.com/static/cdn/bootstrap-iso.css" />
+    <link rel="stylesheet" href="https://formden.com/static/cdn/font-awesome/4.4.0/css/font-awesome.min.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.2/css/bootstrap.min.css" integrity="sha384-y3tfxAZXuh4HwSYylfB+J125MxIs6mR5FOHamPBG064zB+AFeWH94NdvaCBm8qnd" crossorigin="anonymous">
+    <style>.bootstrap-iso .formden_header h2, .bootstrap-iso .formden_header p, .bootstrap-iso form{font-family: Arial, Helvetica, sans-serif; color: black}.bootstrap-iso form button, .bootstrap-iso form button:hover{color: white !important;} .asteriskField{color: red;}</style>
+</head>
+<form method="post" action="{% url 'summary' %}">
+        {% csrf_token %}
+<div class="container mt-5 mb-5">
+  <div class="row">
+
+      <label class="control-label col-sm-1 requiredField" for="s">
+       Date
+       <span class="asteriskField">
+        *
+       </span>
+      </label>
+      <div class="col-sm-3">
+       <div class="input-group">
+        <div class="input-group-addon m-2">
+         <i class="fa fa-calendar">
+         </i>
+        </div>
+        <input class="form-control" id="s" name="s" placeholder="MM/DD/YYYY" type="date" required/>
+       </div>
+      </div>
+          <label class="control-label col-sm-1 requiredField" for="d">
+       To
+       <span class="asteriskField">
+        *
+       </span>
+      </label>
+      <div id="shw" class="col-sm-3 " >
+          <div class="row">
+      <div class="col-sm-9">
+       <div class="input-group">
+        <div class="input-group-addon m-2">
+         <i class="fa fa-calendar">
+         </i>
+        </div>
+        <input class="form-control" id="d" name="d" placeholder="MM/DD/YYYY" type="date" />
+       </div>
+      </div>
+      </div></div>
+    <div class="col-sm-4 text-left btn-lg ">
+    <button type="submit">Generate Report </button>
+    </div>
+  </div>
+</div>
+</form>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Date</th>
+      <th scope="col">Delivered</th>
+      <th scope="col">Undelivered</th>
+      <th scope="col">Total</th>
+      <th scope="col">Download</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if data %}
+    {% for a,b,c,d in data %}
+    <tr>
+      <td>{{a}}</td>
+      <td>{{b}}</td>
+      <td>{{c}}</td>
+      <td>{{d}}</td>
+      <td>http</td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+    {% if date %}
+    <tr>
+      <td>{{date}}</td>
+      <td>{{dc}}</td>
+      <td>{{uc}}</td>
+      <td>{{t}}</td>
+      <td>http</td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
+<script>
+	$(function(){
+    var dtToday = new Date();
+
+    var month = dtToday.getMonth() + 1;
+    var day = dtToday.getDate();
+    var year = dtToday.getFullYear();
+    if(month < 10)
+        month = '0' + month.toString();
+    if(day < 10)
+        day = '0' + day.toString();
+
+    var maxDate = year + '-' + month + '-' + day;
+    $('#d').attr('max', maxDate);
+    $('#s').attr('max', maxDate);
+});
+</script>
+{% endblock content_main %}

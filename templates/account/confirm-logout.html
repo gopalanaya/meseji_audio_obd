@@ -1,0 +1,9 @@
+{% extends 'dashboard_base.html' %}
+{% block content_main %}
+  <h1> Confirm Logout? </h1>
+  <form action="{% url 'account:logout' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Logout</button>
+    <button onclick="history.back()">Go Back</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'dashboard_base.html' %}
+{% load django_bootstrap5 %}
+{% block content_main  %}
+<div class="mt-4 p-5 bg-light text-dark rounded">
+    <h1 class="text-center">Validate SmsTemplate</h1>
+    <form action="{% url 'smscampaign:smstemplate_approve' object.pk %}" method="post">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% bootstrap_button button_type="submit" content="OK" %}
+        {% bootstrap_button button_type="reset" content="Clear" %}
+    </form>
+</div>
+{% endblock %}

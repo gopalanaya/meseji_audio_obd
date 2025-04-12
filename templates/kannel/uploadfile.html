@@ -1,0 +1,93 @@
+{% extends 'dashboard_base.html' %}
+{% load bootstrap %}
+{% block title %} Personalized Campaign {% endblock %}
+{% block style %}
+    .files input {
+    outline: 2px dashed #92b0b3;
+    outline-offset: -10px;
+    -webkit-transition: outline-offset .15s ease-in-out, background-color .15s linear;
+    transition: outline-offset .15s ease-in-out, background-color .15s linear;
+    padding: 120px 0px 85px 35%;
+    text-align: center !important;
+    margin: 0;
+    width: 100% !important;
+}
+.files input:focus{     outline: 2px dashed #92b0b3;  outline-offset: -10px;
+    -webkit-transition: outline-offset .15s ease-in-out, background-color .15s linear;
+    transition: outline-offset .15s ease-in-out, background-color .15s linear; border:1px solid #92b0b3;
+ }
+.files{ position:relative}
+
+.color input{ background-color:#f1f1f1;}
+.files:before {
+    position: absolute;
+    bottom: 10px;
+    left: 0;  pointer-events: none;
+    width: 100%;
+    right: 0;
+    height: 57px;
+    content: " or drag it here. ";
+    display: block;
+    margin: 0 auto;
+    color: #2ea591;
+    font-weight: 600;
+    text-transform: capitalize;
+    text-align: center;
+}
+{% endblock  %}
+{% block content_main %}
+
+<div class="jumbotron">
+    <div class="container">
+        <h3> Upload File</h3>
+        {% if user.balance < 2 %}
+        <p class="text-danger"> Low Balance!!  Please Recharge to continue</p>
+        {% else %}
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group files color">
+                    {{form | bootstrap}}
+            </div>
+            <div class="text-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+        {% endif %}
+            <p> Sample <a href="{% url 'sample_csv_file' %}"> CSV FILE</a>
+    </div>
+    <ul>
+        <li class="text-info"> Please note:</li>
+        <li class="text-secondary">Only Valid entries in CSV file will be sent</li> 
+        <li class="text-secondary">Invalid Entries, titles, etc will be ignored without any message</li>
+        <li class="text-secondary"> Report for Valid Files and Content can be seen on <a href="{% url 'reports' %}"> Report Page</a>.</li>
+        <li class="text-secondary">If your balance reaches 0, the following message will have status as  FAILED </li>
+    </ul>
+</div>
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script>
+    $(document).ready(function (){
+         //load templates
+         $('#id_senderid').on('change', function(e){
+             e.preventDefault();
+             var senderid = $(this).val();
+             $.ajax({
+                 url: "{% url 'load-templates' %}",
+                 type: 'get',
+                 data : {'senderid':senderid},
+                 success: function(response){
+                     console.log(response);
+                     $('#id_templateid').html(response);
+                 }
+             })
+         });
+
+
+
+
+        });
+
+
+
+
+</script>
+{% endblock content_main %}
