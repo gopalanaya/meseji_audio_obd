@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='smsreport',
             name='header',
-            field=models.CharField(default='NotApplication', max_length=6, verbose_name='SMS HEADER'),
+            field=models.CharField(default='NA', max_length=6, verbose_name='SMS HEADER'),
             preserve_default=False,
         ),
         migrations.AddField(
