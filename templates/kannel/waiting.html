@@ -1,0 +1,31 @@
+{% extends 'dashboard_base.html' %}
+{% load render_table from django_tables2 %}
+{% load export_url from django_tables2 %}
+{% block title %} Report {% endblock %}
+{% block content_main %}
+
+<div class="d-flex justify-content-between">
+     <h3> Waiting Messages</h3>
+ <p class="align-right"> Actions:<a href="{% export_url 'csv' %}"> Export CSV </a></p>
+    <div class="dropdown show">
+  <a class="btn btn-secondary dropdown-toggle" href="#" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Filter Report
+  </a>
+
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+    <a class="dropdown-item" href="?msg_origin=personalized">Personalised</a>
+    <a class="dropdown-item" href="?msg_origin=campaign">Campaign</a>
+    <a class="dropdown-item" href="?msg_origin=api">API</a>
+    <a class="dropdown-item" href="{% url 'reports' %}">All report</a>
+  </div>
+</div>
+
+</div>
+  <p class="text-info"> *Message whose delivery status is not recevied. Failed / Success Message will be cleared from this table. Please visit <a href="{% url 'reports' %}"> report page</a>.</p>
+
+
+
+<div class="container">
+ {% render_table table%}
+</div>
+{% endblock content_main %}

@@ -1,0 +1,13 @@
+{% extends 'dashboard_base.html' %}
+{% load render_table from django_tables2 %}
+
+
+{% block content_main %}
+
+<div class="mt-4 p-5 bg-light text-dark rounded">
+    <h1>Sms Report</h1>
+    <a href="{% url 'smscampaign:smstemplate_list' %}" class="btn btn-warning">Back</a>
+    {% render_table table %}
+</div>
+
+{% endblock %}

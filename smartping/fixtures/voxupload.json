@@ -1,0 +1,41 @@
+[
+{
+  "model": "smartping.voxupload",
+  "pk": 6,
+  "fields": {
+    "plantype": 15,
+    "filename": "mynewaudio3",
+    "uploadedfile": "voxupload/KANNADA_EXPIRY_SUSHMITHA_sqyoaTy.wav",
+    "processedfile": "voxupload/processed_KANNADA_EXPIRY_SUSHMITHA_sqyoaTy_QvTLsqu.wav",
+    "status": "APPROVED",
+    "voiceid": "42213",
+    "user": 1
+  }
+},
+{
+  "model": "smartping.voxupload",
+  "pk": 21,
+  "fields": {
+    "plantype": 15,
+    "filename": "hindi_expiry",
+    "uploadedfile": "voxupload/HINDI_EXPIRYSUSHMA_1.wav",
+    "processedfile": "voxupload/processed_HINDI_EXPIRYSUSHMA_1_24MFwkn.wav",
+    "status": "APPROVED",
+    "voiceid": "34667",
+    "user": 2
+  }
+},
+{
+  "model": "smartping.voxupload",
+  "pk": 23,
+  "fields": {
+    "plantype": 15,
+    "filename": "pb_insurance",
+    "uploadedfile": "voxupload/2_NANA_AMBOLE_10-12-24_1731584815_404.wav",
+    "processedfile": "voxupload/processed_2_NANA_AMBOLE_10-12-24_1731584815_404_sewK7Gk.wav",
+    "status": "APPROVED",
+    "voiceid": "34357",
+    "user": 1
+  }
+}
+]

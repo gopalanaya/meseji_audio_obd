@@ -1,0 +1,5 @@
+/obd_env
+.env
+*.pyc
+*.djcache
+*__pycache__/*

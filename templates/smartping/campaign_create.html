@@ -1,0 +1,31 @@
+{% extends 'dashboard_base.html' %}
+{% load django_bootstrap5 %}
+{% block content_main  %}
+<div class="mt-4 p-5 bg-light text-dark rounded">
+    <h1 class="text-center">Create Bulk OBD</h1>
+    <em class="text-info">Note: Base should contains valid 10 digit mobile numbers. </em>
+    <form action="{% url 'smartping:campaign_create' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% bootstrap_form form %}
+        {% bootstrap_button button_type="submit" content="OK" %}
+        {% bootstrap_button button_type="reset" content="Clear" %}
+    </form>
+</div>
+<script>
+    document.getElementById('id_sms_required').addEventListener('change', toggleSmsForm);
+
+    function toggleSmsForm() {
+        let sms_required = document.getElementById('id_sms_required');
+        if (sms_required.checked){
+            document.getElementById('id_duration').parentElement.style.display = 'block';
+            document.getElementById('id_sms_template').parentElement.style.display = 'block';
+        }
+        else {
+            document.getElementById('id_duration').parentElement.style.display = 'none';
+            document.getElementById('id_sms_template').parentElement.style.display = 'none';
+        } 
+    }
+
+    toggleSmsForm();
+</script>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% load static %}
+{% load django_bootstrap5 %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Index {% endblock  %} | Meseji OBD Panel</title>
+
+
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #eeeeee;
+    }
+    .form-group.has-error input {
+       border: 2px solid red;
+    }
+    .help-block {
+       color: orange;
+    }
+    .navbar-brand img {
+      width: 100px;
+    }
+  {% block style %}{% endblock  %}
+  </style>
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="{% url 'smartping:dashboard_home' %}"><img src="{% static 'smartping/img/meseji_logo.png' %}" alt="Meseji"></a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      {% with c=request.path %}
+      <div class="navbar-nav">
+        {% url 'smartping:audio_list' as audio_list_url %}
+        <a class="nav-item nav-link {% if c == audio_list_url %} active{%endif%}" href="{{audio_list_url}}">Audios<span class="visually-hidden">(current)</span></a>
+       {% url 'smscampaign:smstemplate_list' as smstemplate_list_url %}
+        <a class="nav-item nav-link {% if c == smstemplate_list_url %} active{%endif%}" href="{{smstemplate_list_url}}">SmsTemplate<span class="visually-hidden">(current)</span></a>
+       {% url 'smartping:singlevoice_list' as singlecampaign_url %}
+        <a class="nav-item nav-link{% if c == singlecampaign_url %} active{%endif%}" href="{{singlecampaign_url}}">Single OBD<span class="visually-hidden">(current)</span></a>
+       {% url 'smartping:campaign_list' as campaign_url %}
+        <a class="nav-item nav-link{% if c == campaign_url %} active{%endif%}" href="{{campaign_url}}">Bulk OBD<span class="visually-hidden">(current)</span></a>
+        {% url 'summary' as summary_url %} 
+        <a class="nav-item nav-link{% if c == summary_url %} active{%endif%}" href="{{summary_url}}">Summary<span class="visually-hidden">(current)</span></a>
+        {% endwith %}
+        <a class="nav-item nav-link" href="{% url 'account:confirm-logout' %}">Logout</a>
+      </div>
+    </div>
+
+  </nav>
+  <div class="container">
+    {% bootstrap_messages %}
+    {% block content_main %}
+    <script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <div class="file-upload">
+      <button class="file-upload-btn" type="button" onclick="$('.file-upload-input').trigger( 'click' )">Add
+        Image</button>
+
+      <div class="image-upload-wrap">
+        <input class="file-upload-input" type='file' onchange="readURL(this);" accept="image/*" />
+        <div class="drag-text">
+          <h3>Drag and drop a file or select add Image</h3>
+        </div>
+      </div>
+      <div class="file-upload-content">
+        <img class="file-upload-image" src="#" alt="your image" />
+        <div class="image-title-wrap">
+          <button type="button" onclick="removeUpload()" class="remove-image">Remove <span class="image-title">Uploaded
+              Image</span></button>
+        </div>
+      </div>
+    </div>
+    {% endblock content_main %}
+
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,9 @@
+{% extends 'dashboard_base.html' %}
+{% load render_table from django_tables2 %}
+
+{% block content_main %}
+<h1 class="text-center">Single OBD</h1>
+<em class="text-center">This page is for testing obd on single number at a time. For bulk obd please use BULK OBD Menu</em></br>
+<a href="{% url 'smartping:singlevoice_create' %}" class="btn btn-primary">New</a>
+{% render_table table %}
+{% endblock %}

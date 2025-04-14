@@ -1,0 +1,12 @@
+{% extends 'dashboard_base.html' %}
+{% load django_bootstrap5 %}
+{% block content_main  %}
+<div class="mt-4 p-5 bg-light text-dark rounded">
+    <h1 class="text-center">Confirm Delete</h1>
+    <form method="post">{% csrf_token %}
+        <p>Are you sure you want to delete "{{ object.filename }}"?</p>
+        {% bootstrap_form form %}
+        {% bootstrap_button button_type="submit" content="OK" %}
+    </form>
+</div>
+{% endblock %}

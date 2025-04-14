@@ -1,0 +1,68 @@
+{% extends 'dashboard_base.html' %}
+{% load bootstrap %}
+{% block title %} Summary {% endblock %}
+{% block content_main %}
+<form method="post" action="{% url 'summary' %}">
+  {% csrf_token %}
+  <div class="container mt-5 mb-5">
+    <div class="form-row align-items-center">
+       {{form | bootstrap_horizontal:'col-2' }}
+        <div class="col">
+        <button class="btn btn-secondary" type="submit">Generate Report </button>
+        </div>
+    </div>
+  </div>
+</form>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">Date</th>
+      <th scope="col">Delivered</th>
+      <th scope="col">Undelivered</th>
+      <th scope="col">Total</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if data %}
+    {% for d in data %}
+    <tr>
+      <td>{{d.date}}</td>
+      <td>{{d.delivered}}</td>
+      <td>{{d.undelivered}}</td>
+      <td>{{d.total}}</td>
+      <td>{% if d.total %}<a href="{% url 'download_report' d.date %}" >Download</a>{%endif %}</td>
+    </tr>
+    {% endfor %}
+    {% endif %}
+    {% if today %}
+    <tr>
+      <td>{{today.date}}</td>
+      <td>{{today.delivered}}</td>
+      <td>{{today.undelivered}}</td>
+      <td>{{today.total}}</td>
+      <td>{% if today.total %}<a href="{% url 'download_report' today.date %}">Download</a>{% endif %}</td>
+    </tr>
+    {% endif %}
+  </tbody>
+</table>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"> 
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+$( function() {
+  $( "#id_start" ).datepicker(
+       { minDate: "-6M",
+         maxDate: 0,
+         dateFormat: 'yy-mm-dd'
+       });
+  $( "#id_end" ).datepicker(
+       { minDate: "-6M",
+         maxDate: 0,
+         dateFormat: 'yy-mm-dd'
+       });
+  
+} );
+</script>
+{% endblock content_main %}
