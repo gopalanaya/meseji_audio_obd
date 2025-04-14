@@ -229,7 +229,7 @@ def run_campaign(request):
         else:
             # run_audio_obd(campgn_obj)
             background_run_campaign.delay(campgn_obj.id)
-            campgn_obj.is_sent = True
-            campgn_obj.save()
+            # campgn_obj.is_sent = True
+            # campgn_obj.save()
             return HttpResponseRedirect(reverse_lazy('smartping:campaign_list'))
             
