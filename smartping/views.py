@@ -12,6 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 import datetime
+from django.utils import timezone
 from smartping.tasks import background_prepare_report, background_run_campaign, background_update_singlevoice
 from smscampaign.models import SmsTemplate
 
@@ -205,7 +206,7 @@ def download_campaign_report(request):
     audio_duration = campg_obj.voiceId.plantype
     total_sec = campg_obj.valid_count * audio_duration
     report_time = campg_obj.updated_at + datetime.timedelta(seconds=total_sec)
-    if datetime.datetime.now() > report_time:
+    if timezone.now() > report_time:
         # prepare_report(campg_obj)
         background_prepare_report.delay_on_commit(campg_obj.id)
     else:
