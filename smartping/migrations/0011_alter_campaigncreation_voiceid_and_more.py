@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='voxupload',
             name='voiceid',
-            field=models.CharField(blank=True, max_length=15, unique=True),
+            field=models.CharField(blank=True, max_length=15),
         ),
     ]
