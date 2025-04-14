@@ -1,4 +1,4 @@
-from smartping.models import CampaignCreation, CampaignStatus
+from smartping.models import CampaignCreation, CampaignStatus, SingleVoiceCreation
 import csv, datetime, time
 from django.conf import settings
 LOG_DIR = settings.LOG_DIR
@@ -32,6 +32,22 @@ def dump_campaign_log(dumpdata, unsent_list):
             f.write('{}\n'.format(number))
         
 
+def update_singlevoice(obj: SingleVoiceCreation):
+    """ This function will get the latest data and update the field """
+    data = obj.get_campaign_detail(obj.campg_id)
+    count = 0
+    for d in data:
+        
+        if d['id'.upper()] == obj.trans_id:
+            obj.status_fetched = True
+            obj.status = "CLOSED"
+            obj.dtmf = d['dtmf'.upper()]
+            obj.duration = d['duration'.upper()]
+            obj.save()
+            count += 1
+    
+    
+    return f"Total updates: {count}, SingleVoiceCreation with id: {obj.trans_id} is updated successfully"
     
 def send_campaign(number_list: list, camp_obj: CampaignCreation, unsent_list: list):
     target_url = camp_obj.get_post_url()
@@ -306,7 +322,6 @@ def dump_report(data_dict):
                 sent_list.append(line)
 
     nondnd_number = set()
-    dnd_number = set()
 
     if unsent_file.exists():
         for line in open(unsent_file):
@@ -397,4 +412,5 @@ def prepare_report(campaign_instance: CampaignCreation):
         campaign_instance.save()
     
     report_file.unlink()
+    return f"campaign: {campaign_instance.id} reports is prepared successfully"
     
