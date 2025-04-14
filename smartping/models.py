@@ -336,6 +336,7 @@ class CampaignCreation(SmartpingModel):
         sourcefile = self.campaignData.path
         targetfile = Path(sourcefile + '.temp')
         new_file = 'processed_' + os.path.basename(sourcefile)
+        number_list = []
         
 
         with targetfile.open('w', encoding='utf-8') as f:
@@ -346,8 +347,12 @@ class CampaignCreation(SmartpingModel):
                     
                     if re.search(number_pattern, line):
                         number = re.search(number_pattern, line ).groups()[1]
-                        valid_count += 1
-                        f.write('{}\n'.format(number))
+                        if  number not in number_list:
+                            number_list.append(number)
+                            valid_count += 1
+                            f.write('{}\n'.format(number))
+                        else:
+                            invalid_count += 1
                     else:
                         invalid_count += 1
 
