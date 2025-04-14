@@ -11,10 +11,10 @@ from django_tables2 import SingleTableView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
-from smartping.utils import prepare_report, run_audio_obd
 import datetime
-
+from smartping.tasks import background_prepare_report, background_run_campaign, background_update_singlevoice
 from smscampaign.models import SmsTemplate
+
 # Create your views here.
 def obd_dlr(request):
     return HttpResponse("OK")
@@ -92,7 +92,6 @@ class CampaignCreateTemplateView(SuccessMessageMixin, CreateView):
 
         return form
     
-
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
@@ -103,8 +102,6 @@ class CampaignCreationCreateView(LoginRequiredMixin, CampaignCreateTemplateView)
     template_name = 'smartping/campaign_create.html'
     form_class = CampaignCreationForm
     success_url = reverse_lazy('smartping:campaign_list')
-
-
 
 
 
@@ -131,18 +128,7 @@ def refresh_voice_status(request, voiceid):
     return HttpResponseRedirect(reverse_lazy('smartping:audio_list'))
 
 
-def update_singlevoice(obj: SingleVoiceCreation):
-    """ This function will get the latest data and update the field """
-    data = obj.get_campaign_detail(obj.campg_id)
-    for d in data:
-        
-        if d['id'.upper()] == obj.trans_id:
-            obj.status_fetched = True
-            obj.status = "CLOSED"
-            obj.dtmf = d['dtmf'.upper()]
-            obj.duration = d['duration'.upper()]
-            obj.save()
-    
+
 
 @login_required
 def get_campaign_status(request):
@@ -172,7 +158,8 @@ def get_campaign_status(request):
                 obj.status = status
                 obj.save()
             else:
-                update_singlevoice(obj)
+                # update_singlevoice(obj)
+                background_update_singlevoice.delay(obj.id)
 
         return HttpResponseRedirect(reverse_lazy('smartping:singlevoice_list'))
     
@@ -219,7 +206,8 @@ def download_campaign_report(request):
     total_sec = campg_obj.valid_count * audio_duration
     report_time = campg_obj.updated_at + datetime.timedelta(seconds=total_sec)
     if datetime.datetime.now() > report_time:
-        prepare_report(campg_obj)
+        # prepare_report(campg_obj)
+        background_prepare_report.delay_on_commit(campg_obj.id)
     else:
         messages.warning(request, "Too Early to get reports. Please wait")
     return HttpResponseRedirect(reverse_lazy('smartping:campaign_list'))
@@ -239,7 +227,8 @@ def run_campaign(request):
             messages.info(request, f'campaign with id {campgn_obj.id} for user: {campgn_obj.user} is already sent')
             return HttpResponseRedirect(reverse_lazy('smartping:campaign_list'))
         else:
-            run_audio_obd(campgn_obj)
+            # run_audio_obd(campgn_obj)
+            background_run_campaign.delay(campgn_obj.id)
             campgn_obj.is_sent = True
             campgn_obj.save()
             return HttpResponseRedirect(reverse_lazy('smartping:campaign_list'))
