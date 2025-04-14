@@ -22,6 +22,6 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('', include('smartping.urls', namespace='smartping')),
     path('sms/', include('smscampaign.urls' )),
-    path('admin/', admin.site.urls),
+    path('meseji_admin/', admin.site.urls),
     path('account/', include('account.urls', namespace='account')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
