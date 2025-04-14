@@ -209,6 +209,7 @@ def download_campaign_report(request):
     if timezone.now() > report_time:
         # prepare_report(campg_obj)
         background_prepare_report.delay_on_commit(campg_obj.id)
+        messages.info(request, f"We are preparing report for campaign id: {campg_obj.id}")
     else:
         messages.warning(request, "Too Early to get reports. Please wait")
     return HttpResponseRedirect(reverse_lazy('smartping:campaign_list'))
