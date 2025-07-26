@@ -181,7 +181,7 @@ LOGGING = {
             'stream': sys.stdout,  # Redirects print statements to stdout
         },
         'file': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': BASE_DIR / '..' / 'msg_log/info.log',
             'formatter': 'verbose',

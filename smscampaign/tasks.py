@@ -6,6 +6,8 @@ import requests, datetime
 import logging
 from django.conf import settings
 
+logger = logging.getLogger(__name__)
+
 User = get_user_model()
 
 def send_test_message(data):
@@ -89,15 +91,17 @@ def send_test_message(data):
 
     # Now we going to send the message
     sms_sent_url = provider.smsc_sent_url()
-    logging.info('Sending message with params: {params}')
+    logger.warning(f'Sending message with params: {params}')
     res = requests.get(sms_sent_url, params=params)
     if res.status_code == 202:
         sms_report_obj.is_sent = True
         sms_report_obj.msg_status = 'Accepted for delivery'
+        sms_report_obj.sms_type = "approve"
         sms_report_obj.save()
         return 'OK', res.content.decode('utf-8')
     else:
-        sms_report_obj.msg_status = "Error occurred: "+ res.content.decode('utf8')
+        sms_report_obj.msg_status = "Error occurred: "+ res.content.decode('utf-8')
+        logger.error('we received error while sending sms: {}'.format(res.content.decode('utf-8')))
         sms_report_obj.save()
         return 'Error', res.content.decode('utf-8')
 
@@ -109,7 +113,7 @@ def process_dlr(track_code="", dlr_status="", dlr_msg=""):
     if len(all_message) > 0:
         # Message found
         sms_obj = all_message[0]
-        sms_obj.is_delivered = True if dlr_status == 1 else False
+        sms_obj.is_delivered = True if dlr_status == '1' else False
         sms_obj.msg_status = " ".join(dlr_msg.split(' ')[-3:-1]) if dlr_msg else "NA"
 
         if sms_obj.sms_type == 'approve':
@@ -120,8 +124,8 @@ def process_dlr(track_code="", dlr_status="", dlr_msg=""):
             sms_template_obj.save()
 
         sms_obj.save()
-        print(f"Received DLR for {track_code}, {dlr_msg}, {dlr_status} on {datetime.datetime.now()}")
+        logger.warning(f"Received DLR for {track_code}, {dlr_msg}, {dlr_status} on {datetime.datetime.now()}")
 
     else:
         # Need to logs this
-        print(f"Message with track code: '{track_code}' Not found")
+        logger.warning(f"Message with track code: '{track_code}' Not found")

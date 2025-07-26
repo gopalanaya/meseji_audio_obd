@@ -14,11 +14,11 @@ from unidecode import unidecode
 # Create your views here.
 def sms_dlr(request):
     """ The SMS delivery URL. it should be simple but super fast"""
-    track_code = request.get('track_code', None)
+    track_code = request.GET.get('track_code', None)
     if not track_code:
         return HttpResponse('Parameter missing: track_code', 104)
-    delivery_status = request.get('status', None)
-    delivery_msg = request.get('message', None)
+    delivery_status = request.GET.get('dlr_status', None)
+    delivery_msg = request.GET.get('dlr_msg', None)
     process_dlr(track_code=track_code, dlr_status=delivery_status, dlr_msg= delivery_msg)
     return HttpResponse('OK')
 
