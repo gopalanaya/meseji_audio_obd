@@ -3,7 +3,7 @@ from smscampaign.models import SmsReport, KannelSMSC, SmsTemplate
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 import requests, datetime
-import logging
+import logging, hashlib
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
@@ -66,8 +66,13 @@ def send_test_message(data):
     
     TM_ID = getattr(settings, 'TM_ID')
 
+    # need to create a hash
+    tm_id = hashlib.sha256('{},{}'.format(data['pe_id'],TM_ID).encode('utf-8')).hexdigest()
+    print("Tm id is", tm_id)
+
+
     # set meta data
-    params['meta-data'] = f"?smpp?tm_id={TM_ID}&pe_id={data['pe_id']}&template_id={data['template_id']}"
+    params['meta-data'] = f"?smpp?tm_id={tm_id}&pe_id={data['pe_id']}&template_id={data['template_id']}"
 
 
 
