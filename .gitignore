@@ -3,3 +3,5 @@
 *.pyc
 *.djcache
 *__pycache__/*
+db.sqlite3
+launch.json

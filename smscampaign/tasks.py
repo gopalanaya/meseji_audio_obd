@@ -1,8 +1,10 @@
 # tasks file to send_test_message and run campaign
-from smscampaign.models import SmsReport, KannelSMSC
+from smscampaign.models import SmsReport, KannelSMSC, SmsTemplate
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 import requests, datetime
+import logging
+from django.conf import settings
 
 User = get_user_model()
 
@@ -23,7 +25,7 @@ def send_test_message(data):
         'charset':'iso-8859-1',
         'coding':0,
         'dlr-mask':11,
-        'meta-data':'?smpp?pe_id=1701159231459927489&template_id=1707172796396663040'
+        'meta-data':'?smpp?tm_id=tm_id_given&pe_id=1701159231459927489&template_id=1707172796396663040'
         }
 
     Response: Status, message
@@ -60,8 +62,12 @@ def send_test_message(data):
         params['charset'] = 'utf-8'
         params['coding'] = 2
     
+    TM_ID = getattr(settings, 'TM_ID')
+
     # set meta data
-    params['meta-data'] = f"?smpp?pe_id={data['pe_id']}&template_id=data['template_id]"
+    params['meta-data'] = f"?smpp?tm_id={TM_ID}&pe_id={data['pe_id']}&template_id={data['template_id']}"
+
+
 
     # get the user with username
     if not cache.get(data['username']):
@@ -83,8 +89,9 @@ def send_test_message(data):
 
     # Now we going to send the message
     sms_sent_url = provider.smsc_sent_url()
+    logging.info('Sending message with params: {params}')
     res = requests.get(sms_sent_url, params=params)
-    if res.status_code == 200:
+    if res.status_code == 202:
         sms_report_obj.is_sent = True
         sms_report_obj.msg_status = 'Accepted for delivery'
         sms_report_obj.save()
@@ -96,14 +103,22 @@ def send_test_message(data):
 
 
     
-def process_dlr(track_code, dlr_status, dlr_msg):
+def process_dlr(track_code="", dlr_status="", dlr_msg=""):
     """ Just save the dlr reports and logs """
     all_message = SmsReport.objects.filter(track_code=track_code)
     if len(all_message) > 0:
         # Message found
         sms_obj = all_message[0]
         sms_obj.is_delivered = True if dlr_status == 1 else False
-        sms_obj.msg_status = dlr_msg #
+        sms_obj.msg_status = " ".join(dlr_msg.split(' ')[-3:-1]) if dlr_msg else "NA"
+
+        if sms_obj.sms_type == 'approve':
+            # Need to approve the smsTemplate too
+            sms_template_obj = SmsTemplate.objects.get(user=sms_obj.user, template_id = sms_obj.template_id)
+            sms_template_obj.is_verified = True
+            sms_template_obj.test_status = 'delvrd'
+            sms_template_obj.save()
+
         sms_obj.save()
         print(f"Received DLR for {track_code}, {dlr_msg}, {dlr_status} on {datetime.datetime.now()}")
 

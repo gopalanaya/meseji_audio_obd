@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from pathlib import Path
-import environ
+import environ, sys
 
 env = environ.Env(
     DEBUG=(bool, False)
@@ -149,6 +149,9 @@ SMARTPING_URL= env('smartping_url')
 SMARTPING_USERNAME = env('smartping_username')
 SMARTPING_PASSWORD = env('smartping_password')
 
+# Get Telemarketer id
+TM_ID= env('TM_ID')
+
 # default login redirect
 LOGIN_REDIRECT_URL = 'smartping:dashboard_home'
 LOGOUT_REDIRECT_URL = 'account:login'
@@ -171,7 +174,12 @@ LOGGING = {
             'style': '{',
         },
     },
-    'handlers': {
+    'handlers': {       
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'stream': sys.stdout,  # Redirects print statements to stdout
+        },
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
@@ -181,7 +189,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
+            'handlers': ['file', 'console'],
             'level': 'INFO',
             'propagate': True,
         },

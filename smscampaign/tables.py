@@ -14,4 +14,5 @@ class SmsTemplateTable(tables.Table):
 class SmsReportTable(tables.Table):
     class Meta:
         model = SmsReport
-        fields = ('track_code', 'sms_route', 'user', 'header', 'pe_id', 'template_id', 'message', 'is_sent', 'is_delivered', 'msg_status')
+        fields = ( 'created_at', 'track_code', 'sms_route', 'user', 'header', 'pe_id', 'template_id', 'message', 'is_sent', 'is_delivered', 'msg_status')
+        order_by = ('-created_at', )

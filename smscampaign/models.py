@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
+from django.urls import reverse
 
 import uuid
 
@@ -23,11 +25,11 @@ class KannelSMSC(models.Model):
     # create the sms_sent_url
     def smsc_sent_url(self):
         if self.host.startswith('http'):
-            self.host = self.host.split('//')[1]
+            host = self.host.split('//')[1]
         if self.is_https:
-            return f'https://{self.host}:{self.port}/cgi-bin/sendsms'
+            return f'https://{host}:{self.port}/cgi-bin/sendsms'
         else:
-            return f'http://{self.host}:{self.port}/cgi-bin/sendsms'
+            return f'http://{host}:{self.port}/cgi-bin/sendsms'
     
 
 TEST_STATUS_CHOICES = (
@@ -50,6 +52,8 @@ class SmsTemplate(models.Model):
        we need to check out the reports too.
 
        and mark it as not verified also.
+
+       Need to track the verification
       
     """
     # Who created this template
@@ -92,6 +96,10 @@ class SmsTemplate(models.Model):
         return data
     
 
+SMS_REPORT_TYPE_CHOICE = (
+    ('approve', 'Approval'),
+    ('normal', 'Normal'),
+)
 class SmsReport(models.Model):
     """This tables will keep records of SMS sent and their status
     Below information is stored
@@ -122,12 +130,28 @@ class SmsReport(models.Model):
     # Need to set which route use to send sms
     sms_route = models.ForeignKey(KannelSMSC, on_delete=models.DO_NOTHING, default=1)
 
+    # type of sms
+    sms_type = models.CharField(max_length=10, choices=SMS_REPORT_TYPE_CHOICE, default='normal')
+
     def __str__(self):
         return f'{self.user.username} {self.header} {self.msg_status}'
     
     def get_dlr_url(self):
         # this need to prepare smartly
-        pass
+        if not cache.get('dlr_host'):
+            from django.conf import settings
+            host_list = getattr(settings, 'ALLOWED_HOSTS')
+            dlr_host = host_list[0]
+            cache.set('dlr_host', dlr_host, timeout=3600)
+        else:
+            dlr_host = cache.get('dlr_host')
+
+        if dlr_host in ['localhost', '127.0.0.1']:
+            host = f'http://{dlr_host}:8000'
+        else:
+            host = f'https://{dlr_host}'
+        return f'{host}{reverse("smscampaign:dlr-url")}?track_code={self.track_code}&dlr_status=%d&dlr_msg=%A'
+        
     
 
 
