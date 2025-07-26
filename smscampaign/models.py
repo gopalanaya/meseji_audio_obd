@@ -149,7 +149,7 @@ class SmsReport(models.Model):
         if dlr_host in ['localhost', '127.0.0.1']:
             host = f'http://{dlr_host}:8000'
         else:
-            host = f'https://{dlr_host}'
+            host = f'http://{dlr_host}'
         return f'{host}{reverse("smscampaign:dlr-url")}?track_code={self.track_code}&dlr_status=%d&dlr_msg=%A'
         
     
