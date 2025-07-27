@@ -54,7 +54,7 @@ def send_test_message(data):
         'to': data['to'],
         'from': data['header'],
         'text': data['message'],
-        'dlr_mask': 11
+        'dlr-mask': 3
     }
     if len(data['message']) == len(data['message'].encode()):
         # its ASCII message
