@@ -125,7 +125,7 @@ def run_audio_obd(campaign_instance):
 
             # get 50 % from number
             for num in batch_list[100:-100]:
-                if choice([0,1]):
+                if choice([0,1,1,1]):
                     number_list.append(num)
                 else:
                     unsent_list.append(num)
