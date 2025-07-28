@@ -204,7 +204,12 @@ def download_campaign_report(request):
     campg_obj = campg_objlist[0]
     # Need to wait until all number is processed
     audio_duration = campg_obj.voiceId.plantype
-    total_sec = campg_obj.valid_count * audio_duration
+
+    # need to change the time
+    if campg_obj.valid_count < 100:
+        total_sec = campg_obj.valid_count * audio_duration
+    else:
+        total_sec = 7200
     report_time = campg_obj.updated_at + datetime.timedelta(seconds=total_sec)
     if timezone.now() > report_time:
         # prepare_report(campg_obj)
