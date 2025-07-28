@@ -373,7 +373,7 @@ def dump_report(data_dict):
         my_data['DURATION'] = random.choice(['2', '3', '4', '5'])
         my_data['STARTTIME'] = (data_dict['started_at'] + datetime.timedelta(seconds=random.randint(20,60))).strftime(dt_fmt)
         my_data['ENDTIME'] = datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt) + datetime.timedelta(seconds=int(my_data['DURATION']))
-        my_data['ID'] = int(datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt).timestamp)
+        my_data['ID'] = int(datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt).timestamp())
 
         append_logs(data_dict['report_file'], my_data, header)
 
