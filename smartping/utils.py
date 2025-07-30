@@ -6,6 +6,9 @@ import logging, requests, json
 from django.core.files import File
 import random 
 from collections import Counter
+import logging
+
+logger = logging.getLogger(__name__)
 
 if not LOG_DIR.exists():
     LOG_DIR.mkdir()
@@ -364,14 +367,20 @@ def dump_report(data_dict):
     custom_report = []
     c = Counter(status_list)
 
+    logger.info(str(c))
+
     # percent failed
     p_failed = round(len(dnd_number)/ len(sent_list) * 100)
     p_answered = round(c['Answered']/ len(sent_list) * 100)
     p_noanswered = round(c['No Answer'] / len(sent_list) * 100)
 
+    logger.info('failed ' + p_failed +":   answered " + p_answered +": no answered" + p_noanswered)
+
     # calculate success rate
+    
 
     mylogic= ['Answered'] * p_answered + ['No Answer'] * p_noanswered + ['FAILED'] * p_failed
+    logger.debug(' my logic is : {}'.format(mylogic))
     for d in dnd_number:
         my_data = {
         "CampaignID": data_dict['campid'],
@@ -403,6 +412,7 @@ def dump_report(data_dict):
             my_data['ENDTIME'] = datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt) + datetime.timedelta(seconds=int(my_data['DURATION']))
             my_data['ID'] = int(datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt).timestamp())
             my_data['CLI'] = cli
+            
         elif status == "No Answer":
             my_data['STATUS'] = status
             my_data['DTMF'] = "NA"
@@ -412,6 +422,7 @@ def dump_report(data_dict):
             my_data['STARTTIME'] = (data_dict['started_at'] + datetime.timedelta(seconds=random.randint(20,60))).strftime(dt_fmt)
             my_data['ENDTIME'] = datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt) + datetime.timedelta(seconds=int(my_data['DURATION']))
             my_data['ID'] = int(datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt).timestamp())
+
         
         elif status == "FAILED":
             my_data['STATUS'] = status
@@ -422,8 +433,9 @@ def dump_report(data_dict):
             my_data['STARTTIME'] = "NA"
             my_data['ENDTIME'] = "NA"
             my_data['ID'] = "NA"           
-
+        
         custom_report.append(my_data)
+        
         # append_logs(data_dict['report_file'], my_data, header)
 
     # rearrange the data
