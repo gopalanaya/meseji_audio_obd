@@ -303,7 +303,7 @@ def dump_report(data_dict):
 
     # Internal function
     def append_logs(filename, data_dict, header):
-        """ This will just append the log file"""
+        """ This will just append the log file in report file"""
         with open(filename, 'a') as f:
             csv_writer = csv.DictWriter(f,
                                         delimiter=',',
@@ -312,6 +312,21 @@ def dump_report(data_dict):
             
             if f.tell() == 0:
                 csv_writer.writeheader()
+            csv_writer.writerow(data_dict)
+
+
+    def dump_smartping_data(filename, data_dict):
+        """ This function will dump smartping data from res_data loop"""
+        
+        with open(filename, 'a') as f:
+            csv_writer = csv.DictWriter(f,
+                delimiter=',',
+                lineterminator='\n',
+                fieldnames=headers
+                )
+            if f.tell() == 0:
+                csv_writer.writeheader()
+
             csv_writer.writerow(data_dict)
 
 
@@ -336,7 +351,15 @@ def dump_report(data_dict):
 
     header = ["ID", "CampaignID",'MSISDN','CLI', 'FLAG','STATUS', 'STARTTIME','ENDTIME', 'DURATION','DTMF']
     res_data = data_dict['res_data']
+
+    # Need to dump fetched logs too
+    server_log = data_dict['campaign_logs_path'] / 'smartping_{}.txt'.format(data_dict['campid'])
     my_data = {} # for keeping last data
+
+    custom_report = []
+
+    # fake sample id
+    fake_id = '384983292'
 
     status_list = []
     for d in res_data:
@@ -352,10 +375,14 @@ def dump_report(data_dict):
         "DTMF": d['DTMF'],
         "ID": d["ID"]
         }
+        fake_id = d["ID"]
+
         status_list.append(d['STATUS'])
         nondnd_number.add(d['MSISDN'][-10:])
         
-        append_logs(data_dict['report_file'], my_data, header)
+        # append_logs(data_dict['report_file'], my_data, header)
+        dump_smartping_data(server_log, d)
+        custom_report.append(my_data)
 
     # get cli used
     cli = d['CLI']   
@@ -364,7 +391,6 @@ def dump_report(data_dict):
     dnd_number = sent_list - nondnd_number
     # dump dnd number
 
-    custom_report = []
     c = Counter(status_list)
 
     logger.info(str(c))
@@ -410,7 +436,8 @@ def dump_report(data_dict):
             my_data['DURATION'] = random.choice(['2', '3', '4', '5',])
             my_data['STARTTIME'] = (data_dict['started_at'] + datetime.timedelta(seconds=random.randint(20,60))).strftime(dt_fmt)
             my_data['ENDTIME'] = datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt) + datetime.timedelta(seconds=int(my_data['DURATION']))
-            my_data['ID'] = int(datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt).timestamp())
+            # my_data['ID'] = 
+            my_data['ID'] = str(fake_id)[:4] + str(round(datetime.datetime.now().timestamp()))[-6:]
             my_data['CLI'] = cli
             
         elif status == "No Answer":
@@ -421,7 +448,7 @@ def dump_report(data_dict):
             my_data['DURATION'] = random.choice(['18','19','20','23','25','27'])
             my_data['STARTTIME'] = (data_dict['started_at'] + datetime.timedelta(seconds=random.randint(20,60))).strftime(dt_fmt)
             my_data['ENDTIME'] = datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt) + datetime.timedelta(seconds=int(my_data['DURATION']))
-            my_data['ID'] = int(datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt).timestamp())
+            my_data['ID'] = str(fake_id)[:4] + str(round(datetime.datetime.now().timestamp()))[-6:]
 
         
         elif status == "FAILED":
