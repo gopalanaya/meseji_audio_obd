@@ -5,6 +5,7 @@ LOG_DIR = settings.LOG_DIR
 import logging, requests, json
 from django.core.files import File
 import random 
+from collections import Counter
 
 if not LOG_DIR.exists():
     LOG_DIR.mkdir()
@@ -311,6 +312,7 @@ def dump_report(data_dict):
             csv_writer.writerow(data_dict)
 
 
+    # getting sent and unsent list
     unsent_file = data_dict['campaign_logs_path'] / 'unsent_{}.txt'.format(data_dict['campid'])
     unsent_list = []
     sent_file = data_dict['campaign_logs_path'] / '{}.txt'.format(data_dict['campid'])
@@ -332,6 +334,8 @@ def dump_report(data_dict):
     header = ["ID", "CampaignID",'MSISDN','CLI', 'FLAG','STATUS', 'STARTTIME','ENDTIME', 'DURATION','DTMF']
     res_data = data_dict['res_data']
     my_data = {} # for keeping last data
+
+    status_list = []
     for d in res_data:
         my_data = {
         "CampaignID": d['CampaignID'],
@@ -345,13 +349,29 @@ def dump_report(data_dict):
         "DTMF": d['DTMF'],
         "ID": d["ID"]
         }
+        status_list.append(d['STATUS'])
         nondnd_number.add(d['MSISDN'][-10:])
         
         append_logs(data_dict['report_file'], my_data, header)
 
+    # get cli used
+    cli = d['CLI']   
+
     sent_list = set(sent_list)
     dnd_number = sent_list - nondnd_number
     # dump dnd number
+
+    custom_report = []
+    c = Counter(status_list)
+
+    # percent failed
+    p_failed = round(len(dnd_number)/ len(sent_list) * 100)
+    p_answered = round(c['Answered']/ len(sent_list) * 100)
+    p_noanswered = round(c['No Answer'] / len(sent_list) * 100)
+
+    # calculate success rate
+
+    mylogic= ['Answered'] * p_answered + ['No Answer'] * p_noanswered + ['FAILED'] * p_failed
     for d in dnd_number:
         my_data = {
         "CampaignID": data_dict['campid'],
@@ -365,17 +385,51 @@ def dump_report(data_dict):
         "DTMF": "NA",
         "ID": "NA"
         }
-        append_logs(data_dict['report_file'], my_data, header)      
+        custom_report.append(my_data)
+        # append_logs(data_dict['report_file'], my_data, header)   
+        # 
 
     for number in unsent_list:
-        my_data['MSISDN'] = ['0'+ number]
-        my_data['DTMF'] = ''
-        my_data['DURATION'] = random.choice(['2', '3', '4', '5'])
-        my_data['STARTTIME'] = (data_dict['started_at'] + datetime.timedelta(seconds=random.randint(20,60))).strftime(dt_fmt)
-        my_data['ENDTIME'] = datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt) + datetime.timedelta(seconds=int(my_data['DURATION']))
-        my_data['ID'] = int(datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt).timestamp())
+        my_data['MSISDN'] = '0'+ number
+        my_data['CampaignID'] = data_dict['campid']
+        
+        status = random.choice(mylogic)
+        if status == 'Answered':
+            my_data['STATUS'] = status
+            my_data['DTMF'] = ''
+            my_data['FLAG'] = 'P'
+            my_data['DURATION'] = random.choice(['2', '3', '4', '5',])
+            my_data['STARTTIME'] = (data_dict['started_at'] + datetime.timedelta(seconds=random.randint(20,60))).strftime(dt_fmt)
+            my_data['ENDTIME'] = datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt) + datetime.timedelta(seconds=int(my_data['DURATION']))
+            my_data['ID'] = int(datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt).timestamp())
+            my_data['CLI'] = cli
+        elif status == "No Answer":
+            my_data['STATUS'] = status
+            my_data['DTMF'] = "NA"
+            my_data['FLAG'] = "P"
+            my_data['CLI'] = cli
+            my_data['DURATION'] = random.choice(['18','19','20','23','25','27'])
+            my_data['STARTTIME'] = (data_dict['started_at'] + datetime.timedelta(seconds=random.randint(20,60))).strftime(dt_fmt)
+            my_data['ENDTIME'] = datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt) + datetime.timedelta(seconds=int(my_data['DURATION']))
+            my_data['ID'] = int(datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt).timestamp())
+        
+        elif status == "FAILED":
+            my_data['STATUS'] = status
+            my_data['DTMF'] = "NA"
+            my_data['FLAG'] = "DND"
+            my_data['CLI'] = "NA"
+            my_data['DURATION'] = "NA"
+            my_data['STARTTIME'] = "NA"
+            my_data['ENDTIME'] = "NA"
+            my_data['ID'] = "NA"           
 
-        append_logs(data_dict['report_file'], my_data, header)
+        custom_report.append(my_data)
+        # append_logs(data_dict['report_file'], my_data, header)
+
+    # rearrange the data
+    random.shuffle(custom_report)
+    for d in custom_report:
+        append_logs(data_dict['report_file'], d, header)
 
     
 
