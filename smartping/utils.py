@@ -374,13 +374,13 @@ def dump_report(data_dict):
     p_answered = round(c['Answered']/ len(sent_list) * 100)
     p_noanswered = round(c['No Answer'] / len(sent_list) * 100)
 
-    logger.info('failed ' + p_failed +":   answered " + p_answered +": no answered" + p_noanswered)
+    logger.info(f'failed {p_failed},  answered {p_answered}, no answered {p_noanswered}')
 
     # calculate success rate
     
 
     mylogic= ['Answered'] * p_answered + ['No Answer'] * p_noanswered + ['FAILED'] * p_failed
-    logger.debug(' my logic is : {}'.format(mylogic))
+    logger.debug(f' my logic is : {mylogic}')
     for d in dnd_number:
         my_data = {
         "CampaignID": data_dict['campid'],
