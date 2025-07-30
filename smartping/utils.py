@@ -317,7 +317,7 @@ def dump_report(data_dict):
 
     def dump_smartping_data(filename, data_dict):
         """ This function will dump smartping data from res_data loop"""
-        
+        headers = list(data_dict.keys())
         with open(filename, 'a') as f:
             csv_writer = csv.DictWriter(f,
                 delimiter=',',
