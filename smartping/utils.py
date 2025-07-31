@@ -425,7 +425,6 @@ def dump_report(data_dict):
         # 
 
     for number in unsent_list:
-        print('new number is ', number)
         my_data['MSISDN'] = '0'+ number
         my_data['CampaignID'] = data_dict['campid']
         
@@ -464,8 +463,8 @@ def dump_report(data_dict):
             my_data['ENDTIME'] = "NA"
             my_data['ID'] = "NA"         
             
-        print('my data now is ', my_data)
-        custom_report.append(my_data)  
+        custom_report.append(my_data)
+        print('Last 2 records ', custom_report[-2:]) 
         
         
         
