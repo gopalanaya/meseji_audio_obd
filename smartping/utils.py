@@ -382,7 +382,7 @@ def dump_report(data_dict):
         
         # append_logs(data_dict['report_file'], my_data, header)
         dump_smartping_data(server_log, d)
-        custom_report.append(my_data)
+        custom_report.append(my_data.copy())
 
     # get cli used
     cli = d['CLI']   
@@ -420,7 +420,7 @@ def dump_report(data_dict):
         "DTMF": "NA",
         "ID": "NA"
         }
-        custom_report.append(my_data)
+        custom_report.append(my_data.copy())
         # append_logs(data_dict['report_file'], my_data, header)   
         # 
 
@@ -463,8 +463,8 @@ def dump_report(data_dict):
             my_data['ENDTIME'] = "NA"
             my_data['ID'] = "NA"         
             
-        custom_report.append(my_data)
-        print('Last 2 records ', custom_report[-2:]) 
+        custom_report.append(my_data.copy())
+ 
         
         
         
