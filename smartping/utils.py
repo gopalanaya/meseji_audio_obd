@@ -439,6 +439,7 @@ def dump_report(data_dict):
             # my_data['ID'] = 
             my_data['ID'] = str(fake_id)[:4] + str(round(datetime.datetime.now().timestamp()))[-6:]
             my_data['CLI'] = cli
+            custom_report.append(my_data)
             
         elif status == "No Answer":
             my_data['STATUS'] = status
@@ -449,6 +450,7 @@ def dump_report(data_dict):
             my_data['STARTTIME'] = (data_dict['started_at'] + datetime.timedelta(seconds=random.randint(20,60))).strftime(dt_fmt)
             my_data['ENDTIME'] = datetime.datetime.strptime(my_data['STARTTIME'], dt_fmt) + datetime.timedelta(seconds=int(my_data['DURATION']))
             my_data['ID'] = str(fake_id)[:4] + str(round(datetime.datetime.now().timestamp()))[-6:]
+            custom_report.append(my_data)
 
         
         elif status == "FAILED":
@@ -459,9 +461,10 @@ def dump_report(data_dict):
             my_data['DURATION'] = "NA"
             my_data['STARTTIME'] = "NA"
             my_data['ENDTIME'] = "NA"
-            my_data['ID'] = "NA"           
+            my_data['ID'] = "NA"         
+            custom_report.append(my_data)  
         
-        custom_report.append(my_data)
+        
         
         # append_logs(data_dict['report_file'], my_data, header)
 
