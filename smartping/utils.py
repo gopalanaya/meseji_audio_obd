@@ -443,7 +443,7 @@ def dump_report(data_dict):
             
         elif status == "No Answer":
             my_data['STATUS'] = status
-            my_data['DTMF'] = "NA"
+            my_data['DTMF'] = ""
             my_data['FLAG'] = "P"
             my_data['CLI'] = cli
             my_data['DURATION'] = random.choice(['18','19','20','23','25','27'])
