@@ -134,3 +134,93 @@ def process_dlr(track_code="", dlr_status="", dlr_msg=""):
     else:
         # Need to logs this
         logger.warning(f"Message with track code: '{track_code}' Not found")
+
+
+def send_campaign_message(data):
+    """ A function to send a test message and track the status. 
+    Also it will update a message status, it should return message id or something
+
+    data:
+         to - destination number
+        header = Header to send
+        pe_id = pe_id of message
+        message = message
+        template_id = sms_template
+        username = User who send the sms
+    
+    """
+    # First need to send the sms and then makes entry in the database.
+    # check if any Kannel SMSC present or not
+    if KannelSMSC.objects.count() == 0:
+        return False, 'No SMSC is attached'
+    
+    # Future function to check if we have any smsc attached to username
+    # This is important, as we need to define that the given message should
+    # use defined SMSC
+    if not cache.get('default_provider'):
+        provider = KannelSMSC.objects.first()
+        cache.set('default_provider', provider, timeout=3600)
+    
+    provider = cache.get('default_provider')
+
+    params = {
+        'smsc': provider.smsc,
+        'username': provider.username,
+        'password': provider.password,
+        'to': data['to'],
+        'from': data['header'],
+        'text': data['message'],
+        'dlr-mask': 3
+    }
+    if len(data['message']) == len(data['message'].encode()):
+        # its ASCII message
+        params['charset'] = 'iso-8859-1'
+        params['coding'] = 0
+    else:
+        params['charset'] = 'utf-8'
+        params['coding'] = 2
+    
+    TM_ID = getattr(settings, 'TM_ID')
+
+    # need to create a hash
+    tm_id = hashlib.sha256('{},{}'.format(data['pe_id'],TM_ID).encode('utf-8')).hexdigest()
+    print("Tm id is", tm_id)
+
+
+    # set meta data
+    params['meta-data'] = f"?smpp?tm_id={tm_id}&pe_id={data['pe_id']}&template_id={data['template_id']}"
+
+
+
+    # get the user with username
+    if not cache.get(data['username']):
+        sms_user = User.objects.get(username=data['username'])
+        cache.set(data['username'], sms_user, timeout=3600)
+    else:
+        sms_user = cache.get(data['username'])
+
+    # prepare dlr_url, get the trackcode from SMS report
+    sms_report_obj = SmsReport.objects.create(
+        header = data['header'],
+        pe_id = data['pe_id'],
+        message = data['message'],
+        template_id = data['template_id'],
+        user=sms_user
+    )
+    # dlr url should be prepared automatically
+    params['dlr-url'] = sms_report_obj.get_dlr_url()
+
+    # Now we going to send the message
+    sms_sent_url = provider.smsc_sent_url()
+    logger.warning(f'Sending message with params: {params}')
+    res = requests.get(sms_sent_url, params=params)
+    if res.status_code == 202:
+        sms_report_obj.is_sent = True
+        sms_report_obj.msg_status = 'Accepted for delivery'
+        sms_report_obj.save()
+        return 'OK', res.content.decode('utf-8')
+    else:
+        sms_report_obj.msg_status = "Error occurred: "+ res.content.decode('utf-8')
+        logger.error('we received error while sending sms: {}'.format(res.content.decode('utf-8')))
+        sms_report_obj.save()
+        return 'Error', res.content.decode('utf-8')

@@ -11,14 +11,40 @@ from django_tables2 import SingleTableView
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
-import datetime
+import datetime, json
 from django.utils import timezone
-from smartping.tasks import background_prepare_report, background_run_campaign, background_update_singlevoice
+from smartping.tasks import (
+    background_prepare_report,
+      background_run_campaign,
+     background_update_singlevoice,
+     process_dlr)
 from smscampaign.models import SmsTemplate
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+
 
 # Create your views here.
+@csrf_exempt
 def obd_dlr(request):
-    return HttpResponse("OK")
+    """ Parameter required:
+     api_key:
+     data :  All data for dlr
+     method post
+    """
+    # need to authenticate and check api key
+    if request.method == 'POST':
+        print(request.body)
+        body = json.loads(request.body)
+        api_key = body.get('api_key')
+        data = body.get('data')
+        if api_key == getattr(settings, 'SMARTPING_API_KEY'):
+            process_dlr.delay(data)
+            return HttpResponse("OK")
+        else:
+            return HttpResponseNotFound('invalid key')
+    
+    else:
+        return HttpResponse('Method not allowed')
 
 
 @login_required

@@ -22,4 +22,7 @@ urlpatterns = [
     path('campaignstatus/', views.get_campaign_status, name="campaign_status"),
     path('generate_report/', views.download_campaign_report, name='campaign_report'),
     path('runcampaign/', views.run_campaign, name="campaign_send"),
+
+    # OBD DRL
+    path('obd_dlr', views.obd_dlr, name="obd_dlr"),
 ]
