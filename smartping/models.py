@@ -297,6 +297,75 @@ OBD_TYPE_CHOICES = (
 
 
 # Create your models here.
+## A Campaign SMS Sent record Table DLR
+## This table will store campaignid and its type and sms to be sent
+
+CAMPAIGN_TYPE_CHOICES = (
+    ('single', "Single"),
+    ('bulk', 'Bulk'),
+)
+class CampaignSmsTracker(models.Model):
+    """ A Model to track campaign registered for SMS.
+    The purpose of this model is to check if any sms sent is registered for
+    given campaign id or not?
+    Property:
+        campaign id - Id which we will get from dlr report,
+                       Campaign id may be duplicate or old, in case of 
+                       old campaign id received.
+                       Handle this accordingly
+        sms_template_id - Foreign keys for sms to be send
+        campaign_type - single or Bulk
+        min_sec (minimum_seconds) - 0 or greater
+                          0 means eligible for every one
+                          > 0 means check number of durations
+        dtmf  - The dtmf value to check for sending sms
+                0, dtmf is not required, minimum duration should be check
+    """
+    campaign = models.CharField('Campaign', max_length=20)
+    sms_template = models.ForeignKey(SmsTemplate, on_delete=models.DO_NOTHING)
+    campaign_type = models.CharField(max_length=6,
+                                    choices=CAMPAIGN_TYPE_CHOICES, default='single')
+    min_sec = models.IntegerField(default=0)
+    dtmf = models.IntegerField(default=0)
+    is_active = models.BooleanField('Active', default=True)
+
+
+
+
+    def check_qualify(self, min_sec=0, dtmf=0):
+        """ A function to check if sms can be sent,
+        Need to check if call is answered or not also.
+        """
+        min_sec, dtmf = int(min_sec), int(dtmf)
+        if self.is_active and min_sec >= self.min_sec and dtmf == self.dtmf:
+            return True
+        else:
+            return False
+        
+    
+
+    def send_sms(self, destination='0'):
+        """ This will send sms to destination number and update record by following steps
+        There is no user, so need to add it.
+        1. fetch the sms template
+        2. send the sms
+        3. Update the required Campaign: Single or Bulk status
+        4. 
+
+        """
+        # Sms data
+        sms_data = {
+        'pe_id' :self.sms_template.pe_id,
+        'template_id' : self.sms_template.template_id,
+        'to': destination[:-10],
+        'message': self.sms_template.message,
+        'header': self.sms_template.header,
+        'username': self.sms_template.user
+        }
+        send_campaign_message.delay(data=sms_data)
+
+
+
 
 # A Base model for common information
 class CampaignCreation(SmartpingModel):
@@ -455,6 +524,26 @@ class SingleVoiceCreation(SmartpingModel):
     def get_post_url(self):
         """ This will be the dynamic urls based on obd_type"""
         return  getattr(settings, 'smartping_url'.upper()) + '/OBD_REST_API/api/OBD_Rest/SINGLE_CALL'
+    
+
+    def create_sms_tracker(self):
+        """ This will create a sms tracker model for tracking"""
+        if self.sms_required:
+            if CampaignSmsTracker.objects.filter(campaign=self.campg_id).count() > 0:
+                # This means sms tracker already exist. so need to update this
+                tracker_object = CampaignSmsTracker.objects.get(campaign=self.campg_id)
+                tracker_object.campaign_type = 'single'
+                tracker_object.min_sec = self.duration
+                tracker_object.dtmf = self.dtmf
+                tracker_object.sms_template = self.sms_template
+                self.is_active = True
+                tracker_object.save()
+            else:
+                CampaignSmsTracker.objects.create(campaign=self.campg_id,
+                                                  sms_template=self.sms_template,
+                                                  min_sec=self.duration,
+                                                  dtmf=self.dtmf)
+            
 
 
     
@@ -485,6 +574,7 @@ def create_campaign(sender, instance, created, **kwargs):
                 instance.err_desc = res_data.get('err_desc'.upper())
 
             instance.save()
+            instance.create_sms_tracker()
         else:
             print(res.content)
 
@@ -551,74 +641,6 @@ class CampaignStatus(models.Model):
         return '%s %s %s' %(self.status, self.msisdn, self.id)
 
         
-## A Campaign SMS Sent record Table DLR
-## This table will store campaignid and its type and sms to be sent
-
-CAMPAIGN_TYPE_CHOICES = (
-    ('single', "Single"),
-    ('bulk', 'Bulk'),
-)
-class CampaignSmsTracker(models.Model):
-    """ A Model to track campaign registered for SMS.
-    The purpose of this model is to check if any sms sent is registered for
-    given campaign id or not?
-    Property:
-        campaign id - Id which we will get from dlr report,
-                       Campaign id may be duplicate or old, in case of 
-                       old campaign id received.
-                       Handle this accordingly
-        sms_template_id - Foreign keys for sms to be send
-        campaign_type - single or Bulk
-        min_sec (minimum_seconds) - 0 or greater
-                          0 means eligible for every one
-                          > 0 means check number of durations
-        dtmf  - The dtmf value to check for sending sms
-                0, dtmf is not required, minimum duration should be check
-    """
-    campaign = models.CharField('Campaign', max_length=20)
-    sms_template = models.ForeignKey(SmsTemplate, on_delete=models.DO_NOTHING)
-    campaign_type = models.CharField(max_length=6,
-                                    choices=CAMPAIGN_TYPE_CHOICES, default='single')
-    min_sec = models.IntegerField(default=0)
-    dtmf = models.IntegerField(default=0)
-    is_active = models.BooleanField('Active', default=True)
-
-
-
-
-    def check_qualify(self, min_sec=0, dtmf=0):
-        """ A function to check if sms can be sent,
-        Need to check if call is answered or not also.
-        """
-        min_sec, dtmf = int(min_sec), int(dtmf)
-        if self.is_active and min_sec >= self.min_sec and dtmf == self.dtmf:
-            return True
-        else:
-            return False
-        
-    
-
-    def send_sms(self, destination='0'):
-        """ This will send sms to destination number and update record by following steps
-        There is no user, so need to add it.
-        1. fetch the sms template
-        2. send the sms
-        3. Update the required Campaign: Single or Bulk status
-        4. 
-
-        """
-        # Sms data
-        sms_data = {
-        'pe_id' :self.sms_template.pe_id,
-        'template_id' : self.sms_template.template_id,
-        'to': destination[:-10],
-        'message': self.sms_template.message,
-        'header': self.sms_template.header,
-        'username': self.sms_template.user
-        }
-        send_campaign_message.delay(data=sms_data)
-
-
 
 
         

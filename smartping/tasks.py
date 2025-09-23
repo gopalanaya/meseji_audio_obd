@@ -60,7 +60,7 @@ def process_dlr(data):
     dump_data(filename, data)
 
     # check if sms is registered for a campaign
-    campaignid = data['CampaignID']
+    campaignid = data['CAMPAIGN_ID']
     campaign_cache_key = 'cmgn_tracker_{}'.format(campaignid)
     if not cache.get(campaign_cache_key):
         tracker_obj = CampaignSmsTracker.objects.filter(campaign=campaignid)
@@ -72,8 +72,8 @@ def process_dlr(data):
             # It may be single or bulk
             for obj in tracker_obj:
                 number = data['MSISDN']
-                min_sec = data['DURATION']
-                dtmf = data['DTMF'] or 0
+                min_sec = data['Call Duration']
+                dtmf = data['DTMF_REP'] or 0
                 if data['STATUS'].lower() == 'answered':
                     res = obj.check_qualify(min_sec=min_sec, dtmf=dtmf)
                     if res:
