@@ -163,7 +163,7 @@ class VoxUpload(SmartpingModel):
         """
         # first verify the plantype and duration
         self.verify_plantype()
-        target_url = getattr(settings, 'SMARTPING_URL') +'/VoxUpload/api/Values/upload'
+        target_url = getattr(settings, 'SMARTPING_URL') +'/VoxUpload/api/Vox/upload'
         # check if its already uploaded
         if self.voiceid:
             return "Already Uploaded"
