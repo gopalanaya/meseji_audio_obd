@@ -163,7 +163,7 @@ class VoxUpload(SmartpingModel):
         """
         # first verify the plantype and duration
         self.verify_plantype()
-        target_url = getattr(settings, 'SMARTPING_URL') +'/VoxUpload/api/Vox/upload'
+        target_url = getattr(settings, 'SMARTPING_URL') +'/VoxUpload/api/Values/upload'
         # check if its already uploaded
         if self.voiceid:
             return "Already Uploaded"
@@ -250,21 +250,6 @@ class VoxUpload(SmartpingModel):
 
 
 
-    
-
-    #def save(self, *args, **kwargs):
-        
-    #    if not self.pk:
-    #        uploadedfile = self.uploadedfile
-        
-    #        # convert the audio
-    #        convert_audio_file(uploadedfile.path)
-    #        processedfile_path = Path(construct_output_filename(uploadedfile.path))
-    #        with processedfile_path.open(mode='rb') as f:
-    #            self.processedfile = File(f, name=processedfile_path.path)
-        
-    #    super(VoxUpload, self).save(*args, **kwargs)
-
 @receiver(post_save, sender=VoxUpload)
 def transcode_and_upload(sender, instance, created, **kwargs):
     if created:
@@ -273,7 +258,10 @@ def transcode_and_upload(sender, instance, created, **kwargs):
         processedfile_path = Path(construct_output_filename(uploadedfile))
 
         with processedfile_path.open(mode='rb') as f:
-            instance.processedfile = File(f, name=processedfile_path.name)
+            # change the name to filename provided in model
+            # name may contains spaces etc so we will sanitize and limit to 15 chars with prefix p_
+            filename = 'p_'+ instance.filename.replace(" ", "_")[:15] + ".wav" 
+            instance.processedfile = File(f, name=filename)
             instance.save()
         
         # Now cleanup the temproary file
@@ -480,7 +468,32 @@ class CampaignCreation(SmartpingModel):
             'campg_id'.upper(): self.campg_id,
             'sms_required': self.sms_required
         }
-    
+
+    def create_sms_tracker(self):
+        """ This will create a sms tracker model for tracking.
+        campg_id contains list of ids separated by comma. e.g, 2345,23456,,3002893,
+        so need to split and create for each id
+        """
+        if self.sms_required:
+            # Loop through campg_ids
+            for campg in self.campg_id.split(','):
+                if campg.strip() == '':
+                    continue
+                if CampaignSmsTracker.objects.filter(campaign=self.campg).count() > 0:
+                    # This means sms tracker already exist. so need to update this
+                    tracker_object = CampaignSmsTracker.objects.get(campaign=self.campg_id)
+                    tracker_object.campaign_type = 'bulk'
+                    tracker_object.min_sec = self.duration
+                    tracker_object.dtmf = self.dtmf
+                    tracker_object.sms_template = self.sms_template
+                    self.is_active = True
+                    tracker_object.save()
+                else:
+                    CampaignSmsTracker.objects.create(campaign=self.campg_id,
+                                                  sms_template=self.sms_template,
+                                                  min_sec=self.duration,
+                                                  campaign_type='bulk',
+                                                  dtmf=self.dtmf)    
 
 
 @receiver(post_save, sender=CampaignCreation, dispatch_uid="create_campaign")
@@ -574,7 +587,10 @@ def create_campaign(sender, instance, created, **kwargs):
                 instance.err_desc = res_data.get('err_desc'.upper())
 
             instance.save()
-            instance.create_sms_tracker()
+            # if error code is 0, then only create sms tracker
+            if err_code == '0':
+                instance.create_sms_tracker()
+
         else:
             print(res.content)
 

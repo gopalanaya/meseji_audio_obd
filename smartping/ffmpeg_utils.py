@@ -13,11 +13,11 @@ def construct_output_filename(inputfile):
     inputfile_name = os.path.basename(inputfile)
     # Make sure that output file should be .wav,
     if not inputfile_name.endswith('.wav'):
-        # filename can have multiple dots
-        inputfile_name = "_".join(inputfile_name.split('.')[:-1]) + '.wav' 
+        # filename can have multiple dots and name should be 10 chars only
+        inputfile_name = "_".join(inputfile_name.split('.')[:-1])[:10] + '.wav' 
         
     dirname = os.path.dirname(inputfile)
-    outputfile_name = os.path.join(dirname, 'processed_'+ inputfile_name)
+    outputfile_name = os.path.join(dirname, 'p_'+ inputfile_name)
 
     return outputfile_name
 

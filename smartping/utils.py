@@ -1,4 +1,4 @@
-from smartping.models import CampaignCreation, CampaignStatus, SingleVoiceCreation
+from smartping.models import CampaignCreation, CampaignStatus, SingleVoiceCreation, CampaignSmsTracker
 import csv, datetime, time
 from django.conf import settings
 LOG_DIR = settings.LOG_DIR
@@ -54,6 +54,14 @@ def update_singlevoice(obj: SingleVoiceCreation):
     return f"Total updates: {count}, SingleVoiceCreation with id: {obj.trans_id} is updated successfully"
     
 def send_campaign(number_list: list, camp_obj: CampaignCreation, unsent_list: list):
+    """ This function will send campaign to smartping server 
+    
+     number_list: List of numbers to send
+     camp_obj: CampaignCreation object
+     unsent_list: List of numbers that are not sent
+
+      
+    """
     target_url = camp_obj.get_post_url()
 
     data = camp_obj.get_data_dict()
@@ -73,12 +81,32 @@ def send_campaign(number_list: list, camp_obj: CampaignCreation, unsent_list: li
            'trans_id': res_data.get('trans_id'.upper()),
            'number_list': ','.join(number_list),
         }
-
-        
+        # create CampaignSmsTracker object if sms_required is True
+        if camp_obj.sms_required:
+            if 'err_code' in res_data and res_data['err_code'] == '0':
+                campid = res_data.get('campg_id'.upper())
+                # check if CampaignSmsTracker already exists
+                if CampaignSmsTracker.objects.filter(campaign=campid).count() > 0:
+                    # Need to check if active or not
+                    camp_obj_sms = CampaignSmsTracker.objects.get(campaign=campid)
+                    if not camp_obj_sms.is_active:
+                        camp_obj_sms.is_active = True
+                        camp_obj_sms.save()
+                else:     
+                    CampaignSmsTracker.objects.create(
+                        campaign=campid,
+                        sms_template=camp_obj.sms_template,
+                        campaign_type='bulk',
+                        min_sec=camp_obj.sms_min_sec,
+                        dtmf_required=camp_obj.sms_dtmf_required,
+                )
+                    
     # add the campg_id to instance
     if not camp_obj.campg_id:
+        # its empty, so write first
         camp_obj.campg_id = dump_data['campg_id']
     else:
+        # append to existing
         camp_obj.campg_id += ',{}'.format(dump_data['campg_id'])
     camp_obj.save()
         

@@ -50,7 +50,10 @@ def transcode_file(sender, instance, created, **kwargs):
         processedfile_path = Path(construct_output_filename(uploadedfile))
 
         with processedfile_path.open(mode='rb') as f:
-            instance.processedfile = File(f, name=processedfile_path.name)
+            # we will change the name to filename provided in model
+            # name may contains spaces etc so we will sanitize and limit to 15 chars with prefix p_
+            filename = 'p_'+ instance.name.replace(" ", "_")[:15] + ".wav"
+            instance.processedfile = File(f, name=filename)
             instance.save()
         
         # Now cleanup the temproary file
